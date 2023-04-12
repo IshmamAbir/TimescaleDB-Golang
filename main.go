@@ -82,4 +82,29 @@ func main(){
 	fmt.Println("Successfully created hypertable 'sensor_data'")
 	fmt.Println("------------------------")
 
+
+
+	// ------------------------------
+	// insert rows of data into table
+	// ------------------------------
+
+	// single row insert
+	sensorTypes := []string{"a","b","c","d"}
+	sensorLocations:= []string{"floor","ceiling","floor","ceiling"}
+
+	for i := range sensorTypes{
+		queryInsertMetadata:= `INSERT INTO sensors (type,location) VALUES ($1,$2);`
+
+		_,err = conn.Exec(ctx, queryInsertMetadata,sensorTypes[i],sensorLocations[i])
+		if err!=nil {
+			fmt.Println("Unable to insert data into the table: sensors \n",err)
+			return
+		}
+		fmt.Printf("Inserted sensor (%s,%s) into database\n",sensorTypes[i],sensorLocations[i])
+	}
+	fmt.Println("------------------------")
+	fmt.Println("Successfully Inserted all sensors into database")
+	fmt.Println("------------------------")
+
+	
 }
