@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
@@ -49,15 +50,15 @@ func main(){
 	// Create Relational Table
 	// -----------------------
 
-	queryCreateTable := `CREATE TABLE sensors (id SERIAL PRIMARY KEY,
-	type VARCHAR(50), location VARCHAR(50));`
-	_,err=conn.Exec(ctx, queryCreateTable)
-	if err!= nil {
-		fmt.Println("Unable to create sensors table: \n",err)
-		return
-	}
-	fmt.Println("Successfully created relational table: Sensors")
-	fmt.Println("------------------------")
+	// queryCreateTable := `CREATE TABLE sensors (id SERIAL PRIMARY KEY,
+	// type VARCHAR(50), location VARCHAR(50));`
+	// _,err=conn.Exec(ctx, queryCreateTable)
+	// if err!= nil {
+	// 	fmt.Println("Unable to create sensors table: \n",err)
+	// 	return
+	// }
+	// fmt.Println("Successfully created relational table: Sensors")
+	// fmt.Println("------------------------")
 
 
 
@@ -66,21 +67,21 @@ func main(){
 	// Generate hypertable
 	// -------------------
 
-	queryCreateTable = `CREATE TABLE sensor_data (
-        time TIMESTAMPTZ NOT NULL,
-        sensor_id INTEGER,
-        temperature DOUBLE PRECISION,
-        cpu DOUBLE PRECISION,
-        FOREIGN KEY (sensor_id) REFERENCES sensors (id));
-        `
-	queryCreateHyperTable:= `SELECT create_hypertable('sensor_data','time');`
-	_,err = conn.Exec(ctx,queryCreateTable+queryCreateHyperTable)
-	if err!=nil {
-		fmt.Println("UNable to create sensor_data hypertable")
-		return
-	}
-	fmt.Println("Successfully created hypertable 'sensor_data'")
-	fmt.Println("------------------------")
+	// queryCreateTable = `CREATE TABLE sensor_data (
+    //     time TIMESTAMPTZ NOT NULL,
+    //     sensor_id INTEGER,
+    //     temperature DOUBLE PRECISION,
+    //     cpu DOUBLE PRECISION,
+    //     FOREIGN KEY (sensor_id) REFERENCES sensors (id));
+    //     `
+	// queryCreateHyperTable:= `SELECT create_hypertable('sensor_data','time');`
+	// _,err = conn.Exec(ctx,queryCreateTable+queryCreateHyperTable)
+	// if err!=nil {
+	// 	fmt.Println("UNable to create sensor_data hypertable")
+	// 	return
+	// }
+	// fmt.Println("Successfully created hypertable 'sensor_data'")
+	// fmt.Println("------------------------")
 
 
 
@@ -89,22 +90,90 @@ func main(){
 	// ------------------------------
 
 	// single row insert
-	sensorTypes := []string{"a","b","c","d"}
-	sensorLocations:= []string{"floor","ceiling","floor","ceiling"}
+	// sensorTypes := []string{"a","b","c","d"}
+	// sensorLocations:= []string{"floor","ceiling","floor","ceiling"}
 
-	for i := range sensorTypes{
-		queryInsertMetadata:= `INSERT INTO sensors (type,location) VALUES ($1,$2);`
+	// for i := range sensorTypes{
+	// 	queryInsertMetadata:= `INSERT INTO sensors (type,location) VALUES ($1,$2);`
 
-		_,err = conn.Exec(ctx, queryInsertMetadata,sensorTypes[i],sensorLocations[i])
-		if err!=nil {
-			fmt.Println("Unable to insert data into the table: sensors \n",err)
+	// 	_,err = conn.Exec(ctx, queryInsertMetadata,sensorTypes[i],sensorLocations[i])
+	// 	if err!=nil {
+	// 		fmt.Println("Unable to insert data into the table: sensors \n",err)
+	// 		return
+	// 	}
+	// 	fmt.Printf("Inserted sensor (%s,%s) into database\n",sensorTypes[i],sensorLocations[i])
+	// }
+	// fmt.Println("------------------------")
+	// fmt.Println("Successfully Inserted all sensors into database")
+	// fmt.Println("------------------------")
+
+
+	// multiple row insert
+
+	//generate random data
+	queryDataGeneration := `
+	SELECT generate_series(now() - interval '24 hour', now(), interval '5 minute') AS time,
+	floor(random()*(3)+1)::int as sensor_id,
+	random()*100 AS temperature,
+	random() AS cpu
+	`
+
+	rows,err:= conn.Query(ctx,queryDataGeneration)
+	if err!=nil {
+		fmt.Println("Unable to generate sensor data\n",err)
+		return
+	}
+	defer rows.Close()
+	fmt.Println(rows)
+
+	fmt.Println("Successfully generated sensor_data")
+
+	type result struct{
+		Time time.Time
+		SensorId int
+		Temperature float64
+		CPU float64
+	}
+
+	var results []result
+	for rows.Next(){
+		var r result
+		err =  rows.Scan(&r.Time, &r.SensorId,&r.Temperature,&r.CPU)
+		if err!= nil {
+			fmt.Println("Unable to scan: \n",err)
 			return
 		}
-		fmt.Printf("Inserted sensor (%s,%s) into database\n",sensorTypes[i],sensorLocations[i])
+		results=append(results, r)
+	}
+
+	// Any errors encountered by rows.Next or rows.Scan methods are returned here
+	if rows.Err() !=nil {
+		fmt.Println("rows error \n",rows.Err())
+		return
+	}
+
+	fmt.Println("Contents of result slice")
+	for i := range results {
+		var r result
+		r=results[i]
+		fmt.Printf("Time: %s  | ID: %d  | Temperature: %f  | CPU: %f \n",&r.Time, r.SensorId,r.Temperature,r.CPU)
 	}
 	fmt.Println("------------------------")
-	fmt.Println("Successfully Inserted all sensors into database")
-	fmt.Println("------------------------")
 
-	
+	queryInsertTimeseriesData := `
+	INSERT INTO sensor_data (time, sensor_id, temperature,cpu) VALUES ($1,$2,$3,$4);`
+
+	for i := range results {
+		var r result
+		r=results[i]
+		_,err:= conn.Exec(ctx,queryInsertTimeseriesData,r.Time,r.SensorId,r.Temperature,r.CPU)
+		if err!=nil {
+			fmt.Println("Unable to insert sample data into timescale", err)
+			return
+		}
+		defer rows.Close()
+	}
+	fmt.Println("Sucessfully inserted samples into sensor_data hypertable")
+	fmt.Println("---------------------------")
+
 }
