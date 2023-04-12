@@ -59,4 +59,27 @@ func main(){
 	fmt.Println("Successfully created relational table: Sensors")
 	fmt.Println("------------------------")
 
+
+
+
+	// -------------------
+	// Generate hypertable
+	// -------------------
+
+	queryCreateTable = `CREATE TABLE sensor_data (
+        time TIMESTAMPTZ NOT NULL,
+        sensor_id INTEGER,
+        temperature DOUBLE PRECISION,
+        cpu DOUBLE PRECISION,
+        FOREIGN KEY (sensor_id) REFERENCES sensors (id));
+        `
+	queryCreateHyperTable:= `SELECT create_hypertable('sensor_data','time');`
+	_,err = conn.Exec(ctx,queryCreateTable+queryCreateHyperTable)
+	if err!=nil {
+		fmt.Println("UNable to create sensor_data hypertable")
+		return
+	}
+	fmt.Println("Successfully created hypertable 'sensor_data'")
+	fmt.Println("------------------------")
+
 }
