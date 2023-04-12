@@ -43,4 +43,20 @@ func main(){
 	fmt.Println(greetings)
 	fmt.Println("------------------------")
 
+
+	
+	// -----------------------
+	// Create Relational Table
+	// -----------------------
+
+	queryCreateTable := `CREATE TABLE sensors (id SERIAL PRIMARY KEY,
+	type VARCHAR(50), location VARCHAR(50));`
+	_,err=conn.Exec(ctx, queryCreateTable)
+	if err!= nil {
+		fmt.Println("Unable to create sensors table: \n",err)
+		return
+	}
+	fmt.Println("Successfully created relational table: Sensors")
+	fmt.Println("------------------------")
+
 }
