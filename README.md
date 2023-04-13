@@ -8,9 +8,9 @@ To get started, you'll need to install Docker and TimescaleDB on your local mach
 
 2. Once Docker is installed, run the following command to download the TimescaleDB Docker image:
 
-```
-docker pull timescale/timescaledb:latest-pg15
-```
+   ```
+   docker pull timescale/timescaledb:latest-pg15
+   ```
 
 ### Step 2: Start the TimescaleDB Container
 
@@ -42,24 +42,24 @@ This command opens a PostgreSQL shell inside the container, where you can create
 
 2. To create a PostgreSQL database, you can run the following SQL command:
 
-```
-CREATE DATABASE timescale_test;
-```
+   ```
+   CREATE DATABASE timescale_test;
+   ```
 
-2. To create a PostgreSQL table, First you have to move to the following database
+3. To create a PostgreSQL table, First you have to move to the following database
    ```
    \c timescale_test
    ```
-3. Now you can run the following SQL command:
+4. Now you can run the following SQL command:
 
-```
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-);
-```
+   ```
+   CREATE TABLE users (
+       id SERIAL PRIMARY KEY,
+       name TEXT NOT NULL,
+       email TEXT NOT NULL UNIQUE,
+       password TEXT NOT NULL
+   );
+   ```
 
 This command creates a users table with columns for id, name, email, and password. The id column is an auto-incrementing primary key, and the email column has a unique constraint to ensure that each email address is only used once.
 
