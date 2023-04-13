@@ -34,7 +34,13 @@ This command opens a PostgreSQL shell inside the container, where you can create
 
 ### Step 4: Create a PostgreSQL Database & Table
 
-1. To create a PostgreSQL database, you can run the following SQL command:
+1. First run the timescale database inside your docker container
+
+   ```
+   docker exec -it timescaledb psql -U postgres
+   ```
+
+2. To create a PostgreSQL database, you can run the following SQL command:
 
 ```
 CREATE DATABASE timescale_test;
