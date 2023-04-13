@@ -1,3 +1,5 @@
+日本語の README => [日本語のバージョン](README-jp.md)
+
 ### Step 1: Install Docker and TimescaleDB
 
 To get started, you'll need to install Docker and TimescaleDB on your local machine. Here are the steps to do that:
