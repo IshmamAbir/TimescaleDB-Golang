@@ -17,7 +17,9 @@ func main() {
 	// --------------------------------
 	_ = godotenv.Load()
 	ctx := context.Background()
-	connStr := os.Getenv("DATABASE_CONENECTION_STRING") // postgres://username:password@host:port/dbname?sslmode=require
+	connStr := os.Getenv("DATABASE_CONENECTION_STRING")
+	// for localhost using from docker -> postgres://username:password@host:port/dbname?sslmode=disable
+	// using from cloud -> copy link from timescaleCloud
 
 	conn, err := pgx.Connect(ctx, connStr)
 	// conn, err := pgxpool.New(ctx, connStr)
