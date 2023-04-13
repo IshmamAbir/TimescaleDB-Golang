@@ -46,57 +46,57 @@ func main() {
 	// Create Relational Table
 	// -----------------------
 
-	// queryCreateTable := `CREATE TABLE sensors (id SERIAL PRIMARY KEY,
-	// type VARCHAR(50), location VARCHAR(50));`
-	// _,err=conn.Exec(ctx, queryCreateTable)
-	// if err!= nil {
-	// 	fmt.Println("Unable to create sensors table: \n",err)
-	// 	return
-	// }
-	// fmt.Println("Successfully created relational table: Sensors")
-	// fmt.Println("------------------------")
+	queryCreateTable := `CREATE TABLE sensors (id SERIAL PRIMARY KEY,
+	type VARCHAR(50), location VARCHAR(50));`
+	_, err = conn.Exec(ctx, queryCreateTable)
+	if err != nil {
+		fmt.Println("Unable to create sensors table: \n", err)
+		return
+	}
+	fmt.Println("Successfully created relational table: Sensors")
+	fmt.Println("------------------------")
 
 	// -------------------
 	// Generate hypertable
 	// -------------------
 
-	// queryCreateTable = `CREATE TABLE sensor_data (
-	//     time TIMESTAMPTZ NOT NULL,
-	//     sensor_id INTEGER,
-	//     temperature DOUBLE PRECISION,
-	//     cpu DOUBLE PRECISION,
-	//     FOREIGN KEY (sensor_id) REFERENCES sensors (id));
-	//     `
-	// queryCreateHyperTable:= `SELECT create_hypertable('sensor_data','time');`
-	// _,err = conn.Exec(ctx,queryCreateTable+queryCreateHyperTable)
-	// if err!=nil {
-	// 	fmt.Println("UNable to create sensor_data hypertable")
-	// 	return
-	// }
-	// fmt.Println("Successfully created hypertable 'sensor_data'")
-	// fmt.Println("------------------------")
+	queryCreateTable = `CREATE TABLE sensor_data (
+	    time TIMESTAMPTZ NOT NULL,
+	    sensor_id INTEGER,
+	    temperature DOUBLE PRECISION,
+	    cpu DOUBLE PRECISION,
+	    FOREIGN KEY (sensor_id) REFERENCES sensors (id));
+	    `
+	queryCreateHyperTable := `SELECT create_hypertable('sensor_data','time');`
+	_, err = conn.Exec(ctx, queryCreateTable+queryCreateHyperTable)
+	if err != nil {
+		fmt.Println("UNable to create sensor_data hypertable")
+		return
+	}
+	fmt.Println("Successfully created hypertable 'sensor_data'")
+	fmt.Println("------------------------")
 
 	// ------------------------------
 	// insert rows of data into table
 	// ------------------------------
 
 	// single row insert
-	// sensorTypes := []string{"a","b","c","d"}
-	// sensorLocations:= []string{"floor","ceiling","floor","ceiling"}
+	sensorTypes := []string{"a", "b", "c", "d"}
+	sensorLocations := []string{"floor", "ceiling", "floor", "ceiling"}
 
-	// for i := range sensorTypes{
-	// 	queryInsertMetadata:= `INSERT INTO sensors (type,location) VALUES ($1,$2);`
+	for i := range sensorTypes {
+		queryInsertMetadata := `INSERT INTO sensors (type,location) VALUES ($1,$2);`
 
-	// 	_,err = conn.Exec(ctx, queryInsertMetadata,sensorTypes[i],sensorLocations[i])
-	// 	if err!=nil {
-	// 		fmt.Println("Unable to insert data into the table: sensors \n",err)
-	// 		return
-	// 	}
-	// 	fmt.Printf("Inserted sensor (%s,%s) into database\n",sensorTypes[i],sensorLocations[i])
-	// }
-	// fmt.Println("------------------------")
-	// fmt.Println("Successfully Inserted all sensors into database")
-	// fmt.Println("------------------------")
+		_, err = conn.Exec(ctx, queryInsertMetadata, sensorTypes[i], sensorLocations[i])
+		if err != nil {
+			fmt.Println("Unable to insert data into the table: sensors \n", err)
+			return
+		}
+		fmt.Printf("Inserted sensor (%s,%s) into database\n", sensorTypes[i], sensorLocations[i])
+	}
+	fmt.Println("------------------------")
+	fmt.Println("Successfully Inserted all sensors into database")
+	fmt.Println("------------------------")
 
 	// multiple row insert
 
