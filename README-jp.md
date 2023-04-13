@@ -6,9 +6,9 @@
 
 Docker がインストールされたら、次のコマンドを実行して TimescaleDB Docker イメージをダウンロードします：
 
-    ```
-    docker pull timescale/timescaledb:latest-pg15
-    ```
+```
+docker pull timescale/timescaledb:latest-pg15
+```
 
 ### ステップ 2：TimescaleDB コンテナの起動
 
@@ -40,9 +40,9 @@ docker exec -it timescaledb psql -U postgres
 
 2. PostgreSQL データベースを作成するには、次の SQL コマンドを実行できます：
 
-```
-CREATE DATABASE timescale_test;
-```
+   ```
+   CREATE DATABASE timescale_test;
+   ```
 
 3. PostgreSQL テーブルを作成するには、最初に次のデータベースに移動する必要があります。
    ```
