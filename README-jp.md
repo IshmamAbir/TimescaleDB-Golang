@@ -32,17 +32,23 @@ docker exec -it timescaledb psql -U postgres
 
 ### ステップ 4：PostgreSQL データベースとテーブルの作成
 
-1. PostgreSQL データベースを作成するには、次の SQL コマンドを実行できます：
+1. First run the timescale database inside your docker container
 
    ```
-   CREATE DATABASE timescale_test;
+   docker exec -it timescaledb psql -U postgres
    ```
 
-2. PostgreSQL テーブルを作成するには、最初に次のデータベースに移動する必要があります。
+2. PostgreSQL データベースを作成するには、次の SQL コマンドを実行できます：
+
+```
+CREATE DATABASE timescale_test;
+```
+
+3. PostgreSQL テーブルを作成するには、最初に次のデータベースに移動する必要があります。
    ```
    \c timescale_test
    ```
-3. これで、次の SQL コマンドを実行できます：
+4. これで、次の SQL コマンドを実行できます：
 
    ```
    CREATE TABLE users (
